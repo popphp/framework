@@ -9,7 +9,7 @@ $dotEnv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotEnv->safeLoad();
 
 try {
-    $config = include __DIR__ . '/config/app.console.php';
+    $config = include __DIR__ . '/vendor/popphp/pop-kettle/config/app.console.php';
     if (file_exists(__DIR__ . '/kettle.inc.php')) {
         include __DIR__ . '/kettle.inc.php';
     }
@@ -18,8 +18,9 @@ try {
     $config['routes'] = Pop\Console\CommandRegistry::loadRoutes($config['routes'], __DIR__ . '/app/src/Console/Command/Kettle');
 
     $app = new Pop\Kettle\Application($autoloader, $config);
-    $app->load();
-    $app->run();
+    $app->prepare()
+        ->load()
+        ->run();
 } catch (\Exception $exception) {
     $app = new Pop\Kettle\Application();
     $app->cliError($exception);
