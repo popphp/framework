@@ -25,7 +25,7 @@ more information on the full framework and its individual components, visit
 
 New Features
 ------------
-* A large number of improvements, upgrades and refactors across many components.
+* A large number of new features, improvements, upgrades and refactors across many components.
 * Support for PHP 8.4+.
 * PHPUnit tests refactored for PHPUnit 12.5+.
 * Reference the [CHANGELOG.md](https://github.com/popphp/popphp-framework/blob/master/CHANGELOG.md) for further details.
