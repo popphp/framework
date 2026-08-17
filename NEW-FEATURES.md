@@ -4,7 +4,7 @@
 
 Everything **Pop PHP Framework v7.0.0** gives you that **v6.0.0** did not, component by component.
 
-**263 new features** across the bundled components, plus one entirely new package.
+**265 new features** across the bundled components, plus one entirely new package.
 
 This is the companion to [`BC-BREAKS.md`](BC-BREAKS.md). That document tells you what will break; this one
 tells you what you get for it.
@@ -119,15 +119,15 @@ queues (`pop-queue`), syslog/stdout/NDJSON logging (`pop-log`), NDJSON debug sto
 | pop-http | 5.3.8 → 6.0.0 | 17 |
 | popphp (core) | 4.4.4 → 5.0.0 | 17 |
 | pop-code | 5.0.8 → 6.0.0 | 14 |
+| pop-kettle | 2.3.4 → 3.0.0 | 11 |
 | pop-pdf | 5.2.12 → 6.0.0 | 11 |
 | pop-queue | 2.1.3 → 3.0.0 | 11 |
-| pop-kettle | 2.3.4 → 3.0.0 | 10 |
 | pop-log | 4.0.4 → 5.0.0 | 10 |
 | pop-mail | 4.0.7 → 5.0.0 | 10 |
 | pop-mime | 2.0.3 → 3.0.0 | 10 |
 | pop-cache | 4.0.3 → 5.0.0 | 9 |
+| pop-console | 4.2.6 → 5.0.0 | 9 |
 | pop-color | 1.0.3 → 2.0.0 | 8 |
-| pop-console | 4.2.6 → 5.0.0 | 8 |
 | pop-db | 6.8.15 → 7.0.0 | 8 |
 | pop-storage | 2.1.3 → 3.0.0 | 8 |
 | pop-acl | 4.1.4 → 5.0.0 | 7 |
@@ -1108,8 +1108,8 @@ class MyConfig extends Config {
 
 ## pop-console — 4.2.6 → 5.0.0
 
-**Summary:** From an output/help-screen helper into a small CLI toolkit: table and progress-bar renderers, a standalone command registry with directory-based discovery, commands that are themselves dispatchable, and testable prompts via an injectable input stream.
-**Feature count:** 8
+**Summary:** From an output/help-screen helper into a small CLI toolkit: table and progress-bar renderers, a standalone command registry with directory-based discovery, commands that are themselves dispatchable, namespace-filtered help screens, and testable prompts via an injectable input stream.
+**Feature count:** 9
 
 ### Table renderer
 New `Pop\Console\Table` plus a `Console::table()` facade renders headers and rows into a bordered grid with configurable border characters, optional header colorization, and column widths computed from content. Passing `null` for the vertical character drops the column dividers.
@@ -1202,6 +1202,22 @@ $console->setInputStream($stream);
 $name = $console->prompt('Please provide your name: ');   // 'Nick', no TTY needed
 ```
 **In v6:** the only override was the undocumented, test-only `$_SERVER['X_POP_CONSOLE_INPUT']` string — one canned answer per process. That hook is gone in v7.
+
+### Subcommand-filtered help screens
+`help()` and `displayHelp()` take an optional `$subCommand` that narrows the help screen to the commands under one namespace, so a CLI app with dozens of commands can answer `./myapp help db` instead of dumping everything.
+
+```php
+// v7
+$console->help(null, false, 'db');      // help(?string $command, bool $raw, ?string $subCommand)
+$console->displayHelp(false, 'db');
+```
+
+```text
+    db:migrate    Migrate the database
+    db:seed       Seed the database
+```
+Matching is a plain prefix check against each command's own bare name, so it is not tied to `:` as a delimiter and works just as well for space-separated names like `user list`/`user edit`. To make that reliable, `CommandRegistry` now records the script name a command was registered under (`setScriptName()`/`getScriptName()`/`hasScriptName()`) and strips it by exact value before matching — so a script named `dbapp` can't make `'db'` match every command it owns. A `$subCommand` that matches nothing renders an empty list instead of throwing.
+**In v6:** not possible — `displayHelp()` rendered the entire registry, and there was no way to scope it.
 
 ### Non-exiting `confirm()`
 `confirm()` gained a trailing `bool $exit = true`. Passing `false` returns the response so the caller can branch on it, instead of the method calling `exit(127)` on a "no" answer.
@@ -2436,7 +2452,7 @@ try {
 ## pop-kettle — 2.3.4 → 3.0.0
 
 **Summary:** A front-end build system scaffolded straight into your app at `app:init` (AlpineJS, Vue or React, each with Tailwind CSS), a full `queue:*` command family, project-defined `create:command` commands that can be auto-discovered and dispatched through Kettle or through your own stand-alone CLI application, multi-connection database config, and opt-in stand-alone CLI app scaffolding.
-**Feature count:** 10
+**Feature count:** 11
 
 ### Front-end scaffolding at `app:init` — AlpineJS, Vue or React, each with Tailwind
 `app:init` now offers to install a complete front-end build system alongside your PHP app. The prompt appears for any install flavor that includes web — `--web`, `--web --api`, `--web --cli`, `--web --api --cli`, or no flavor flags at all, since web is the default. (An API-only or CLI-only install is never asked.)
@@ -2466,15 +2482,27 @@ Source assets live under `app/`, next to `app/src` and `app/view`, and build out
 Init then runs `npm install` and `npm run build` itself, so the landing page is already built and styled the first time you load it. If Node/npm is not on your `PATH`, `app:init` still completes — you get a warning telling you to install Node and run the two npm commands yourself.
 **In v6:** not possible — `app:init` scaffolded PHP only. Front-end tooling was entirely your problem: your own `package.json`, your own bundler config, your own output paths, and your own `<link>`/`<script>` tags to match them.
 
-### `asset:watch` and `asset:build`
-Two commands wrapping the front-end build, so you do not have to leave `kettle` to rebuild assets.
+### The `web:` command group — `web:serve`, `web:watch`, `web:build`
+Everything to do with running and building the web side of an app now sits in one namespace, so `./kettle help web` lists the whole workflow in one place. `web:watch` and `web:build` wrap the front-end build, so you do not have to leave `kettle` to rebuild assets, and the v6 `serve` command moved here as `web:serve`.
 
 ```bash
-./kettle asset:watch   # npm run watch -> vite build --watch
-./kettle asset:build   # npm run build -> one-shot production build
+./kettle web:serve [--host=] [--port=] [--folder=]   # PHP's built-in server
+./kettle web:watch                                   # npm run watch -> vite build --watch
+./kettle web:build                                   # npm run build -> one-shot production build
 ```
-`asset:watch` rebuilds `public/assets/js/app.js` and `public/assets/css/app.css` to disk on every save. There is no dev server and no hot-module reload — you refresh the browser yourself. Both commands print a message and exit cleanly if the project has no front-end installed or if npm is not on your `PATH`, so neither one blows up on a PHP-only project.
-**In v6:** not possible — no asset commands existed.
+`web:watch` rebuilds `public/assets/js/app.js` and `public/assets/css/app.css` to disk on every save. There is no dev server and no hot-module reload — you refresh the browser yourself. Both asset commands print a message and exit cleanly if the project has no front-end installed or if npm is not on your `PATH`, so neither one blows up on a PHP-only project.
+**In v6:** `serve` existed but stood alone, and there were no asset commands at all. Note that `serve` has no alias in v7 — see the BC guide.
+
+### `help <command>` narrows the help screen to one namespace
+`./kettle help` now takes an optional command namespace and lists only the commands under it, instead of the full screen. The trailing `:` is optional, and `--raw` combines freely with it.
+
+```bash
+./kettle help db          # only db:* commands
+./kettle help web         # web:serve, web:watch, web:build
+./kettle help --raw db:   # same, without ANSI color
+```
+A namespace that matches nothing prints an empty list rather than erroring. Your own `create:command` commands are matched the same way, so `./kettle help myapp` narrows to the ones you wrote.
+**In v6:** not possible — `help` took only `--raw`, and printed every registered command every time.
 
 ### Queue command family (`queue:*`)
 A complete `pop-queue` front end: configure a queue's adapter (File, Database or Redis) interactively, run the worker or scheduler as a daemon or a single cron-friendly pass, inspect pending/dead-letter jobs and scheduled tasks, and clear them.

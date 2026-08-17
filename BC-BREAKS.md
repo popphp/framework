@@ -5,7 +5,7 @@
 Everything that will break when you upgrade an application from **Pop PHP Framework v6.0.0** to **v7.0.0**,
 and what to change in your code for each one.
 
-**336 breaks** across the bundled components — **125 high**, **120 medium**, **91 low**.
+**338 breaks** across the bundled components — **125 high**, **121 medium**, **92 low**.
 
 This is the companion to [`NEW-FEATURES.md`](NEW-FEATURES.md). This document tells you what will break; that
 one tells you what you get for it.
@@ -73,7 +73,7 @@ number, so a caret range on any v6 constraint will refuse the v7 release rather 
 | pop-code | 5.0.8 → 6.0.0 | 10 (4/3/3) |
 | pop-color | 1.0.3 → 2.0.0 | 6 (3/1/2) |
 | pop-config | 4.0.4 → 5.0.0 | 8 (3/2/3) |
-| pop-console | 4.2.6 → 5.0.0 | 7 (3/3/1) |
+| pop-console | 4.2.6 → 5.0.0 | 8 (3/3/2) |
 | pop-cookie | 4.0.4 → 5.0.0 | 6 (2/3/1) |
 | pop-crypt | 3.0.1 → 4.0.0 | 9 (3/4/2) |
 | pop-css | 2.0.3 → 3.0.0 | 6 (1/2/3) |
@@ -87,7 +87,7 @@ number, so a caret range on any v6 constraint will refuse the v7 release rather 
 | pop-http | 5.3.8 → 6.0.0 | 19 (5/9/5) |
 | pop-i18n | 4.0.3 → 5.0.0 | 9 (0/3/6) |
 | pop-image | 4.1.3 → 5.0.0 | 2 (1/0/1) |
-| pop-kettle | 2.3.4 → 3.0.0 | 15 (4/7/4) |
+| pop-kettle | 2.3.4 → 3.0.0 | 16 (4/8/4) |
 | pop-log | 4.0.4 → 5.0.0 | 12 (6/4/2) |
 | pop-mail | 4.0.7 → 5.0.0 | 22 (11/7/4) |
 | pop-mime | 2.0.3 → 3.0.0 | 16 (10/4/2) |
@@ -135,7 +135,7 @@ number, so a caret range on any v6 constraint will refuse the v7 release rather 
 
 ## Cross-cutting patterns
 
-Four themes account for most of the 336 breaks. Recognizing them makes the per-component sections faster to read.
+Four themes account for most of the 338 breaks. Recognizing them makes the per-component sections faster to read.
 
 **1. `declare(strict_types=1)` everywhere.** Strict mode is decided by the *calling* file, so your own code is
 mostly unaffected — but wherever a component passes your loosely-typed value into *its own* strict internals,
@@ -1234,7 +1234,7 @@ v7 gates every format on `is_file()` first, which does not consult `include_path
 ## pop-console
 
 **Scope:** `Command` was rebuilt on top of `popphp` 5's new `Pop\Dispatch` stack (making it dispatchable, with `Application`/`Console` now leading its constructor), command storage was extracted into a new `CommandRegistry`, `Table`/`ProgressBar` were added, strict types were enabled, `isWindows()`'s return value was inverted, and the `X_POP_CONSOLE_INPUT` prompt hook was replaced by an injectable stream.
-**Break count:** 7 (3 high, 3 medium, 1 low)
+**Break count:** 8 (3 high, 3 medium, 2 low)
 
 ### `Command` constructor signature changed — `$name` is no longer the first argument
 **Severity:** High — **Affects:** any code that constructs `Pop\Console\Command` (or a subclass) positionally
@@ -1318,10 +1318,20 @@ The logic moved to `CommandRegistry::fromRoutes()`. v7 adds an `else if` that re
 **Migration:** Flatten CLI route configs (or add explicit `'help'` values) so every command key exists in `getRoutes()`, and make sure any `CommandInterface` controller is safely constructible with zero arguments.
 
 ### `Command` now extends `Pop\Dispatch\AbstractDispatcher` and implements two interfaces
-**Severity:** Low — **Affects:** subclasses of `Command` that already defined colliding members
-The new hierarchy injects `dispatch()`, `setDefaultAction()`, `getDefaultAction()`, `$defaultAction`, `application()`, `console()`, `getApplication()`, `getConsole()`, `setApplication()`, `setConsole()`, `hasApplication()`, `hasConsole()` and `hasName()` into every subclass. Constructing a `Command` also now builds a default `new Console(120)`, which runs the terminal-size probe.
+**Severity:** Low — **Affects:** subclasses of `Command` that already defined colliding members, and any class implementing `CommandInterface` directly
+The new hierarchy injects `dispatch()`, `setDefaultAction()`, `getDefaultAction()`, `$defaultAction`, `application()`, `console()`, `getApplication()`, `getConsole()`, `setApplication()`, `setConsole()`, `hasApplication()`, `hasConsole()` and `hasName()` into every subclass, plus `setScriptName()`, `getScriptName()`, `hasScriptName()` and `$scriptName`. Constructing a `Command` also now builds a default `new Console(120)`, which runs the terminal-size probe.
 
-**Migration:** Rename or re-signature any colliding members on `Command` subclasses to match the inherited `Pop\Dispatch` contracts.
+`CommandInterface` grew alongside it and now requires `hasName()` and the three `*ScriptName()` methods. Extending `Command` or `Command\AbstractCommand` picks them all up, but a class implementing the interface directly fatals until it declares them.
+
+**Migration:** Rename or re-signature any colliding members on `Command` subclasses to match the inherited `Pop\Dispatch` contracts, and add the four new methods to any stand-alone `CommandInterface` implementation.
+
+### `Console::help()` and `displayHelp()` gained a trailing `$subCommand` parameter
+**Severity:** Low — **Affects:** `Console` subclasses that override either method
+`help(?string $command = null, bool $raw = false)` is now `help(?string $command = null, bool $raw = false, ?string $subCommand = null)`, and `displayHelp(bool $raw = false)` is now `displayHelp(bool $raw = false, ?string $subCommand = null)`. Both back the new subcommand-filtered help screen.
+
+Callers are unaffected, since the parameter is optional. A subclass that **overrides** either method is the exception — PHP requires an override to accept at least as many parameters as its parent, so a v6 override fatals with an incompatible-declaration error. Overriding `displayHelp()` to customize the help screen is the likely case here.
+
+**Migration:** Nothing to do for plain callers. Add the trailing `?string $subCommand = null` to any override and pass it through.
 
 ---
 
@@ -2519,8 +2529,8 @@ $token = unserialize($_SESSION['pop_captcha']);
 
 ## pop-kettle
 
-**Scope:** Kettle is re-architected from a `Pop\Module\Module` plugged into a generic `Pop\Application` into its own `Pop\Kettle\Application` class with a new `prepare()/load()/run()` bootstrap, a rewritten `kettle`/`kettle.inc.php` contract, restructured scaffolding templates, and a new `queue:*`/`create:command` command surface.
-**Break count:** 15 (4 high, 7 medium, 4 low)
+**Scope:** Kettle is re-architected from a `Pop\Module\Module` plugged into a generic `Pop\Application` into its own `Pop\Kettle\Application` class with a new `prepare()/load()/run()` bootstrap, a rewritten `kettle`/`kettle.inc.php` contract, restructured scaffolding templates, a regrouped `web:*` command namespace, and a new `queue:*`/`create:command` command surface.
+**Break count:** 16 (4 high, 8 medium, 4 low)
 
 ### `Pop\Kettle\Module` removed and replaced by `Pop\Kettle\Application`
 **Severity:** High — **Affects:** any `kettle` script, custom console script, or code that registers Kettle as a module or reads `Module::VERSION`
@@ -2574,6 +2584,21 @@ class MyCtrl extends \Pop\Controller\AbstractController {
 class MyCtrl extends \Pop\Kettle\Controller\AbstractController { … }
 ```
 **Migration:** Extend `Pop\Kettle\Controller\AbstractController`, or add `Pop\Dispatch\ConsoleTrait` and give `$console` a default.
+
+### `serve` renamed to `web:serve`
+**Severity:** Medium — **Affects:** anyone running `./kettle serve`, and any script, Makefile, Procfile, container `CMD` or README that calls it
+The built-in web server command moved under a new `web:` namespace, which also holds the new `web:watch`/`web:build` asset commands. There is no alias — the bare `serve` route is gone, so v6 invocations now print "Invalid Command" and exit without starting anything.
+
+```bash
+# v6
+./kettle serve --host=0.0.0.0 --port=8080
+
+# v7
+./kettle web:serve --host=0.0.0.0 --port=8080
+```
+Flags are unchanged: `--host` still defaults to `localhost`, `--port` to `8000`, `--folder` to `public`.
+
+**Migration:** Change `serve` to `web:serve` everywhere it's invoked. Grep for it outside your PHP source too — this one usually lives in tooling and docs rather than code.
 
 ### `Event\Console::header()` and `::footer()` removed
 **Severity:** Medium — **Affects:** anything that registered these as `app.route.pre` / `app.dispatch.post` listeners

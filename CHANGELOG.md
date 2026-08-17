@@ -65,6 +65,7 @@ CHANGELOG
       application commands directly to pop-kettle (without the need to use a Controller.)
     - Added table rendering
     - Added progress bar functionality
+    - Added ability to display help for sub-commands to filter a help screen down to a smaller set of commands
   + `pop-crypt`
     - Added Sodium/XChaCha20 support
     - Improved security fixes
@@ -114,11 +115,13 @@ CHANGELOG
       + AlpineJS
       + Vue.js
       + React
-    - Added the `asset:watch` and `asset:build` commands to rebuild front-end assets from the kettle helper script.
+    - Added the `web:watch` and `web:build` commands to rebuild front-end assets from the kettle helper script
+    - Moved the `serve` command into the new `web:` command group as `web:serve`
     - Added ability to add executable commands directly to the kettle helper script, as opposed to having to
-      build a separate application script and console controllers.
-    - Added support to manage queues directly from the kettle helper script.
-    - Added autoloading of commands in the application namespace.
+      build a separate application script and console controllers
+    - Added support to manage queues directly from the kettle helper script
+    - Added autoloading of commands in the application namespace
+    - Added new `pop-console` functionality to display help for sub-commands
   + `pop-log`
     - Added PSR Interoperability
       + PSR-3: Logger interface
