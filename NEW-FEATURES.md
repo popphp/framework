@@ -62,7 +62,7 @@ framework is uniformly typed.
 3. **`popphp` absorbs Popcorn's routing.** HTTP-verb routes, a fluent verb API, custom verbs and real
    404-vs-405 handling are now native — plus PSR-11/14/15 layers and a `Pop\Dispatch` namespace that makes
    any class a route target.
-4. **`pop-db`'s shorthand array becomes a query language.** Structured `[OPERATOR, ...]` tuples, OR/AND groups,
+4. **`pop-db` has its shorthand syntax become a query language.** Structured `[OPERATOR, ...]` tuples, OR/AND groups,
    subqueries (`IN`/`EXISTS`), JSON column querying, composite foreign keys, multi-path eager loading —
    plus Record lifecycle hooks and mass-assignment protection.
 5. **`pop-pdf` gains a native PDF reader.** A 39-class `Pop\Pdf\Extract` engine (xref streams, object streams,
