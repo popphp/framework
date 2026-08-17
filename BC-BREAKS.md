@@ -2596,7 +2596,11 @@ $app->on('app.route.pre', fn() => Pop\Kettle\Event\Console::maintenanceDisplay($
 
 ### `Model\Application::init()` / `install()` signatures and defaults changed
 **Severity:** Medium — **Affects:** programmatic scaffolding callers
-Both gained trailing `bool $cliApp = false, bool $createDb = false`. Defaults changed: `$name` `'Pop'` → `'MyApp'`, `$url` `'http://localhost'` → `''`. The template root moved to `config/templates/codebase/<install>`.
+Both gained trailing `bool $cliApp = false, bool $createDb = false, ?string $frontend = null` (`$frontend` being `'alpine'`, `'vue'`, `'react'` or `null` for none). Defaults changed: `$name` `'Pop'` → `'MyApp'`, `$url` `'http://localhost'` → `''`. The template root moved to `config/templates/codebase/<install>`.
+
+Every added parameter is optional, so existing calls keep working. A subclass that **overrides** either method is the exception — PHP requires an override to accept at least as many parameters as its parent, so a v6 override fatals with an incompatible-declaration error until the new parameters are added to it.
+
+**Migration:** Nothing to do for plain callers. If you override `init()` or `install()`, add the trailing parameters to your signature and pass them through.
 
 ### `create:ctrl --cli` no longer also creates an HTTP controller, and now requires `script/`
 **Severity:** Medium — **Affects:** `./kettle create:ctrl --cli <ctrl>`
@@ -2625,8 +2629,9 @@ v6 only handled `$database['default']` and connected immediately. v7 loops every
 
 ### `X_POP_CONSOLE_INPUT_2/3/4` prompt-override hooks removed
 **Severity:** Low — **Affects:** external harnesses that drove Kettle prompts via `$_SERVER`
+The `app:init` prompt sequence also changed, so any script feeding it canned answers is off by more than one. v6 asked four questions; v7 asks up to seven — a stand-alone-CLI-app question for `--cli`, and, for any install flavor including web, a front-end question followed by a framework choice.
 
-**Migration:** Feed prompts through `Console::setInputStream()`.
+**Migration:** Feed prompts through `Console::setInputStream()`, and re-record the answer sequence against a v7 `app:init` run.
 
 ### `.env` template `APP_NAME` default changed from `Pop` to `MyApp`
 **Severity:** Low — **Affects:** re-running `app:init` over a pre-existing `.env`

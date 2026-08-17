@@ -110,6 +110,11 @@ CHANGELOG
   + `pop-image`
     - Removed the Captcha class (outdated and ineffective in today's modern web landscape.)
   + `pop-kettle`
+    - Added ability to install a front-end system from a selection of popular JS frameworks + TailwindCSS (via Vite)
+      + AlpineJS
+      + Vue.js
+      + React
+    - Added the `asset:watch` and `asset:build` commands to rebuild front-end assets from the kettle helper script.
     - Added ability to add executable commands directly to the kettle helper script, as opposed to having to
       build a separate application script and console controllers.
     - Added support to manage queues directly from the kettle helper script.

@@ -4,7 +4,7 @@
 
 Everything **Pop PHP Framework v7.0.0** gives you that **v6.0.0** did not, component by component.
 
-**261 new features** across the bundled components, plus one entirely new package.
+**263 new features** across the bundled components, plus one entirely new package.
 
 This is the companion to [`BC-BREAKS.md`](BC-BREAKS.md). That document tells you what will break; this one
 tells you what you get for it.
@@ -20,9 +20,9 @@ Some entries describe functionality that shipped in v6 but was unreachable or br
 newly *working* rather than brand new, so you can tell whether you are gaining a capability or gaining one
 that finally does what it always claimed.
 
-Section lengths vary widely. `pop-audit` is listed with **261 new features** because its v7 work went entirely
-into correctness and dependency tracking, and `pop-image`, `pop-dir`, `pop-dom`, `pop-filter` and
-`pop-paginator` are similarly short. A short section means that component was already doing its job.
+Section lengths vary widely. `pop-audit` is listed with **no new features** because its v7 work went entirely
+into correctness rather than API surface, and `pop-image`, `pop-filter`, `pop-dom`, `pop-paginator` and
+`pop-dir` are similarly short. A short section means that component was already doing its job.
 
 ---
 
@@ -121,6 +121,7 @@ queues (`pop-queue`), syslog/stdout/NDJSON logging (`pop-log`), NDJSON debug sto
 | pop-code | 5.0.8 → 6.0.0 | 14 |
 | pop-pdf | 5.2.12 → 6.0.0 | 11 |
 | pop-queue | 2.1.3 → 3.0.0 | 11 |
+| pop-kettle | 2.3.4 → 3.0.0 | 10 |
 | pop-log | 4.0.4 → 5.0.0 | 10 |
 | pop-mail | 4.0.7 → 5.0.0 | 10 |
 | pop-mime | 2.0.3 → 3.0.0 | 10 |
@@ -128,14 +129,13 @@ queues (`pop-queue`), syslog/stdout/NDJSON logging (`pop-log`), NDJSON debug sto
 | pop-color | 1.0.3 → 2.0.0 | 8 |
 | pop-console | 4.2.6 → 5.0.0 | 8 |
 | pop-db | 6.8.15 → 7.0.0 | 8 |
-| pop-kettle | 2.3.4 → 3.0.0 | 8 |
 | pop-storage | 2.1.3 → 3.0.0 | 8 |
 | pop-acl | 4.1.4 → 5.0.0 | 7 |
 | pop-crypt | 3.0.1 → 4.0.0 | 7 |
 | pop-view | 4.0.4 → 5.0.0 | 7 |
 | pop-config | 4.0.4 → 5.0.0 | 7 |
-| pop-css | 2.0.3 → 3.0.0 | 6 |
 | pop-dir | 4.0.3 → 5.0.0 | 7 |
+| pop-css | 2.0.3 → 3.0.0 | 6 |
 | pop-i18n | 4.0.3 → 5.0.0 | 6 |
 | **pop-parser** | **NEW (1.0.0)** | **6** |
 | pop-session | 4.0.4 → 5.0.0 | 6 |
@@ -2435,8 +2435,46 @@ try {
 
 ## pop-kettle — 2.3.4 → 3.0.0
 
-**Summary:** A full `queue:*` command family, project-defined `create:command` commands that can be auto-discovered and dispatched through Kettle or through your own stand-alone CLI application, multi-connection database config, and opt-in stand-alone CLI app scaffolding.
-**Feature count:** 8
+**Summary:** A front-end build system scaffolded straight into your app at `app:init` (AlpineJS, Vue or React, each with Tailwind CSS), a full `queue:*` command family, project-defined `create:command` commands that can be auto-discovered and dispatched through Kettle or through your own stand-alone CLI application, multi-connection database config, and opt-in stand-alone CLI app scaffolding.
+**Feature count:** 10
+
+### Front-end scaffolding at `app:init` — AlpineJS, Vue or React, each with Tailwind
+`app:init` now offers to install a complete front-end build system alongside your PHP app. The prompt appears for any install flavor that includes web — `--web`, `--web --api`, `--web --cli`, `--web --api --cli`, or no flavor flags at all, since web is the default. (An API-only or CLI-only install is never asked.)
+
+```text
+Would you like to install a front-end? [Y/N] y
+
+1: AlpineJS
+2: Vue
+3: React
+
+Please select a front-end framework from above:
+```
+
+Whichever you pick, **Tailwind CSS v4** is scaffolded alongside it and **Vite** is the build tool. Tailwind is wired CSS-first through the `@tailwindcss/vite` plugin, so there is no `tailwind.config.js` to maintain — `app/assets/css/app.css` is a single `@import "tailwindcss";` line. Vue and React each get a working counter component to prove the reactive layer is live.
+
+```text
+package.json           # project root, next to the kettle script
+vite.config.js         # project root
+app/assets/css/app.css
+app/assets/js/app.js   # app.jsx for React
+app/assets/js/components/App.vue|App.jsx
+```
+
+Source assets live under `app/`, next to `app/src` and `app/view`, and build output goes to `public/assets`. Vite is configured (`rollupOptions.output.entryFileNames`/`assetFileNames`) to write **fixed, non-hashed paths** — `public/assets/js/app.js` and `public/assets/css/app.css` — for both a watch build and a production build, so the `<link>`/`<script>` tags in the generated `app/view/index.phtml` are correct from the first build and never change between the two. `node_modules/` is added to `.gitignore` for you.
+
+Init then runs `npm install` and `npm run build` itself, so the landing page is already built and styled the first time you load it. If Node/npm is not on your `PATH`, `app:init` still completes — you get a warning telling you to install Node and run the two npm commands yourself.
+**In v6:** not possible — `app:init` scaffolded PHP only. Front-end tooling was entirely your problem: your own `package.json`, your own bundler config, your own output paths, and your own `<link>`/`<script>` tags to match them.
+
+### `asset:watch` and `asset:build`
+Two commands wrapping the front-end build, so you do not have to leave `kettle` to rebuild assets.
+
+```bash
+./kettle asset:watch   # npm run watch -> vite build --watch
+./kettle asset:build   # npm run build -> one-shot production build
+```
+`asset:watch` rebuilds `public/assets/js/app.js` and `public/assets/css/app.css` to disk on every save. There is no dev server and no hot-module reload — you refresh the browser yourself. Both commands print a message and exit cleanly if the project has no front-end installed or if npm is not on your `PATH`, so neither one blows up on a PHP-only project.
+**In v6:** not possible — no asset commands existed.
 
 ### Queue command family (`queue:*`)
 A complete `pop-queue` front end: configure a queue's adapter (File, Database or Redis) interactively, run the worker or scheduler as a daemon or a single cron-friendly pass, inspect pending/dead-letter jobs and scheduled tasks, and clear them.
