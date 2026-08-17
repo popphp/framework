@@ -53,21 +53,21 @@ framework is uniformly typed.
 
 ## The ten most significant additions
 
-1. **`pop-pdf` gains a native PDF reader.** A 39-class `Pop\Pdf\Extract` engine (xref streams, object streams,
-   all standard filters, CMap/CID font decoding, a repair pass) replaces `smalot/pdfparser` — and on top of it,
-   PDF merging, image-only page detection for OCR routing, and real HTML table layout with colspan/rowspan.
-2. **`pop-http` becomes fully PSR-7/17/18.** Immutable messages, six factories, a PSR-18 client — plus a
+1. **`pop-http` becomes fully PSR-7/17/18.** Immutable messages, six factories, a PSR-18 client — plus a
    composable middleware pipeline with retry-and-backoff and PSR-3 logging middleware, and a `Mock` handler
    that makes HTTP-calling code testable with no network.
-3. **`pop-queue` becomes crash-safe and observable.** A lease-based reserve/release/bury model with a
+2. **`pop-queue` becomes crash-safe and observable.** A lease-based reserve/release/bury model with a
    dead-letter store means a worker that dies mid-job no longer loses it; a worker registry adds heartbeats
    and stuck-worker detection; daemon loops with signal handling replace cron-per-minute.
-4. **`popphp` absorbs Popcorn's routing.** HTTP-verb routes, a fluent verb API, custom verbs and real
+3. **`popphp` absorbs Popcorn's routing.** HTTP-verb routes, a fluent verb API, custom verbs and real
    404-vs-405 handling are now native — plus PSR-11/14/15 layers and a `Pop\Dispatch` namespace that makes
    any class a route target.
-5. **`pop-db`'s shorthand array becomes a query language.** Structured `[OPERATOR, ...]` tuples, OR/AND groups,
+4. **`pop-db`'s shorthand array becomes a query language.** Structured `[OPERATOR, ...]` tuples, OR/AND groups,
    subqueries (`IN`/`EXISTS`), JSON column querying, composite foreign keys, multi-path eager loading —
    plus Record lifecycle hooks and mass-assignment protection.
+5. **`pop-pdf` gains a native PDF reader.** A 39-class `Pop\Pdf\Extract` engine (xref streams, object streams,
+   all standard filters, CMap/CID font decoding, a repair pass) replaces `smalot/pdfparser` — and on top of it,
+   PDF merging, image-only page detection for OCR routing, and real HTML table layout with colspan/rowspan.
 6. **`pop-cache` gains PSR-6 and PSR-16** alongside `remember()` with stampede protection, tag-based
    invalidation, atomic counters, an injectable clock for deterministic TTL tests, and Memory/Null adapters.
 7. **`pop-code` catches up to modern PHP.** Attributes, enums, readonly, constructor promotion, variadic and
