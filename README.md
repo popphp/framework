@@ -19,7 +19,7 @@ Released August TBD, 2026
 Overview
 --------
 This repository contains the `composer.json` file to install the full Pop PHP Framework.
-The core Pop PHP components and the additional components below will be installed. For
+The core Pop PHP components and all supporting components will be installed. For
 more information on the full framework and its individual components, visit
 [popphp/popphp-framework](https://github.com/popphp/popphp-framework/).
 
