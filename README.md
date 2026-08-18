@@ -30,9 +30,9 @@ New Features
 * PHPUnit tests refactored for PHPUnit 12.5+.
 * Strict types declaration
 * Installation of PHPStan for static analysis
-* Reference [CHANGELOG.md](https://github.com/popphp/framework/blob/master/CHANGELOG.md) for a general summary of changes
-* Reference [NEW-FEATURES.md](https://github.com/popphp/framework/blob/master/NEW-FEATURES.md) for an extensive review of new features
-* Reference [BC-BREAKS.md](https://github.com/popphp/framework/blob/master/BC-BREAKS.md) for an extensive review of backwards-compatibility breaks when migrating from v6 to v7
+* Reference [CHANGELOG.md](https://github.com/popphp/popphp-framework/blob/master/CHANGELOG.md) for a general summary of changes
+* Reference [NEW-FEATURES.md](https://github.com/popphp/popphp-framework/blob/master/NEW-FEATURES.md) for an extensive review of new features
+* Reference [BC-BREAKS.md](https://github.com/popphp/popphp-framework/blob/master/BC-BREAKS.md) for an extensive review of backwards-compatibility breaks when migrating from v6 to v7
 
 Install
 -------
