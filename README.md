@@ -44,7 +44,7 @@ You can create a new project with the `composer create-project` command, which i
 This way, you will have access to the CLI-helper script `kettle` in the main project folder:
 
 ```bash
-$ composer create-project popphp/framework my-app
+composer create-project popphp/framework my-app
 ```
 
 ##### Option 2: Clone the Repo
@@ -110,7 +110,7 @@ to
 and make sure the newly copied `kettle` script is set to execute (755)
 
 ```bash
-$ chmod 755 kettle
+chmod 755 kettle
 ```
 
 Support
