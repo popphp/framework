@@ -13,8 +13,8 @@ Pop PHP Framework
 
 Release Information
 -------------------
-Pop PHP Framework 7.0.0 [Beta]  
-Released August TBD, 2026
+Pop PHP Framework 7.0.0  
+Released August 17, 2026
 
 Overview
 --------
@@ -28,7 +28,11 @@ New Features
 * A large number of new features, improvements, upgrades and refactors across many components.
 * Support for PHP 8.4+.
 * PHPUnit tests refactored for PHPUnit 12.5+.
-* Reference the [CHANGELOG.md](https://github.com/popphp/popphp-framework/blob/master/CHANGELOG.md) for further details.
+* Strict types declaration
+* Installation of PHPStan for static analysis
+* Reference [CHANGELOG.md](https://github.com/popphp/framework/blob/master/CHANGELOG.md) for a general summary of changes
+* Reference [NEW-FEATURES.md](https://github.com/popphp/framework/blob/master/NEW-FEATURES.md) for an extensive review of new features
+* Reference [BC-BREAKS.md](https://github.com/popphp/framework/blob/master/BC-BREAKS.md) for an extensive review of backwards-compatibility breaks when migrating from v6 to v7
 
 Install
 -------
@@ -40,7 +44,7 @@ You can create a new project with the `composer create-project` command, which i
 This way, you will have access to the CLI-helper script `kettle` in the main project folder:
 
 ```bash
-$ composer create-project popphp/framework project-folder
+$ composer create-project popphp/framework my-app
 ```
 
 ##### Option 2: Clone the Repo
@@ -49,7 +53,7 @@ You can clone this repository directly, which will also install the `kettle` scr
 in the main project folder:
 
 ```bash
-git clone https://github.com/popphp/framework.git project-folder
+git clone https://github.com/popphp/framework.git my-app
 cd project-folder
 composer install
 ```
