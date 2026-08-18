@@ -131,8 +131,12 @@ CHANGELOG
     - Added streams
   + `pop-mail`
     - Removed native message/part functionality and replaced with refactored functionality in `pop-mime`
+    - `Message::parse()` now throws `Pop\Mail\Exception` on content with no header/body delimiter
+      instead of surfacing a `TypeError` from `pop-mime`
   + `pop-mime`
     - Built out native message/part functionality, to be consumed by `pop-mail`
+    - Patched `Message::parseMessage()` throwing a `TypeError` on content with no `\r\n\r\n`
+      header/body delimiter; such content is now parsed as a header-less, body-only message
   + `pop-pdf`
     - Patched known error bug that displayed in strict readers (e.g., Adobe Acrobat)
     - Added native text extract
