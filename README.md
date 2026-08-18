@@ -88,23 +88,19 @@ in the main project folder (options 3 and 4), you can place a copy of the script
 
 ```bash
 cp vendor/popphp/pop-kettle/kettle .
-cp vendor/popphp/pop-kettle/kettle.inc.php .
+cp vendor/popphp/pop-kettle/kettle.inc.orig.php kettle.inc.php
 ```
 Once you've copied the scripts over, you have to change the reference to the script's
 config file from:
 
 ```php
-    $app = new Pop\Application(
-        $autoloader, include __DIR__ . '/config/app.console.php'
-    );
+    $config = include __DIR__ . '/config/app.console.php';
 ```
 
 to
 
 ```php
-    $app = new Pop\Application(
-        $autoloader, include __DIR__ . '/vendor/popphp/pop-kettle/config/app.console.php'
-    );
+    $config = include __DIR__ . '/vendor/popphp/pop-kettle/config/app.console.php';
 ```
 
 and make sure the newly copied `kettle` script is set to execute (755)
