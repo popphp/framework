@@ -88,7 +88,6 @@ in the main project folder (options 3 and 4), you can place a copy of the script
 
 ```bash
 cp vendor/popphp/pop-kettle/kettle .
-cp vendor/popphp/pop-kettle/kettle.inc.orig.php kettle.inc.php
 ```
 Once you've copied the scripts over, you have to change the reference to the script's
 config file from:
