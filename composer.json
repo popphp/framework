@@ -26,5 +26,10 @@
         "branch-alias": {
             "dev-master": "7.0.x-dev"
         }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "Pop\\Kettle\\Application::check"
+        ]
     }
 }
