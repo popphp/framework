@@ -54,7 +54,7 @@ in the main project folder:
 
 ```bash
 git clone https://github.com/popphp/framework.git my-app
-cd project-folder
+cd my-app
 composer install
 ```
 
