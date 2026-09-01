@@ -20,7 +20,7 @@
     ],
     "require": {
         "php": ">=8.4.0",
-        "popphp/popphp-framework": "^7.0.10"
+        "popphp/popphp-framework": "^7.0.11"
     },
     "extra": {
         "branch-alias": {
